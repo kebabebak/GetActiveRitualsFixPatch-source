@@ -1,6 +1,6 @@
 # GetActiveRitualsFixPatch — build kit
 
-Ready-to-use patch is here: https://github.com/kebabebak/HSK-Get-Active-Rituals-Fix-Patch
+> Ready-to-use patch is here: https://github.com/kebabebak/HSK-Get-Active-Rituals-Fix-Patch
 
 Files to compile `GetActiveRitualsFixPatch.dll` for RimWorld HSK 1.5.
 
