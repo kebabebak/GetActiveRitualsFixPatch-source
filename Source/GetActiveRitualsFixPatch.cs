@@ -6,20 +6,6 @@ using RimWorld;
 using Verse;
 using Verse.AI.Group;
 
-/*
- * GetActiveRitualsFixPatch
- *
- * Problem:
- * Vanilla IdeoManager.GetActiveRituals reuses a single instance list (activeRitualsTmp).
- * After rituals, nested calls from gizmo drawing (Precept_Ritual.ShouldShowGizmo),
- * alerts (Alert_AnimaLinkingReady), and optionally Performance Optimizer's GetGizmosFast
- * can re-enter or race on that list. List.Clear() then throws IndexOutOfRangeException
- * and InspectGizmoGrid stops drawing buttons for all buildings.
- *
- * Solution:
- * Replace GetActiveRituals with a version that always returns a fresh list, so callers
- * cannot corrupt shared scratch state. Works with or without Performance Optimizer.
- */
 namespace HSK.GetActiveRitualsFixPatch
 {
     public static class ModCompatibility
@@ -43,6 +29,29 @@ namespace HSK.GetActiveRitualsFixPatch
         }
     }
 
+    /// <summary>
+    /// Problem: vanilla IdeoManager.GetActiveRituals reuses a single instance list
+    /// (activeRitualsTmp). After rituals, nested calls from gizmo drawing
+    /// (Precept_Ritual.ShouldShowGizmo), alerts (Alert_AnimaLinkingReady), and optionally
+    /// Performance Optimizer's GetGizmosFast can re-enter or race on that list. List.Clear()
+    /// then throws IndexOutOfRangeException and InspectGizmoGrid stops drawing buttons for all
+    /// buildings.
+    ///
+    /// Fix: replace GetActiveRituals with a version that always returns a fresh list, so callers
+    /// cannot corrupt shared scratch state. Works with or without Performance Optimizer.
+    /// Prefix return false is required: Postfix cannot fix mutable shared state inside the
+    /// original.
+    ///
+    /// Проблема: vanilla IdeoManager.GetActiveRituals переиспользует один scratch-список
+    /// (activeRitualsTmp). После ритуалов вложенные вызовы из отрисовки gizmo
+    /// (Precept_Ritual.ShouldShowGizmo), алертов (Alert_AnimaLinkingReady) и опционально
+    /// GetGizmosFast у Performance Optimizer могут повторно войти в этот список. List.Clear()
+    /// даёт IndexOutOfRangeException, и InspectGizmoGrid перестаёт рисовать кнопки зданий.
+    ///
+    /// Исправление: подмена GetActiveRituals версией, которая всегда возвращает новый список.
+    /// Работает с Performance Optimizer и без него. Prefix return false обязателен: Postfix
+    /// не исправляет разделяемое изменяемое состояние внутри оригинала.
+    /// </summary>
     public class GetActiveRitualsFixPatchMod : Mod
     {
         private const string HarmonyId = "kebabebak.get.active.rituals.fix.patch";
